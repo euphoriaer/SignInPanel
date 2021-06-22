@@ -121,8 +121,8 @@ public class UIManager : BaseManager<UIManager>
         if (panelDic.ContainsKey(panelName))
         {
             panelDic[panelName].HideMe();
-            GameObject.Destroy(panelDic[panelName].gameObject);
-            panelDic.Remove(panelName);
+            //GameObject.Destroy(panelDic[panelName].gameObject);
+            //panelDic.Remove(panelName);
         }
     }
 

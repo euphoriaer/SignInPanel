@@ -4,10 +4,9 @@ using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-public class GameMain : MonoBehaviour
+public class GameMain : SingletnoAutoMono<GameMain>
 {
-
-    public static string jsonPath = @"F:\unity3D\Signin\Assets\Json\signin.txt";
+    public static string jsonPath = @"C:\Users\panbin\Desktop\signin2.txt";
     public static string jsonCon = "";
 
     public SiginPanel siginPanel;
@@ -16,6 +15,7 @@ public class GameMain : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+      
         //siginPanel = ResMgr.Getinstate().Load<SiginPanel>("UI/Signin");
         //siginPanel.transform.SetParent(father.transform);
         GameStar();
@@ -24,8 +24,7 @@ public class GameMain : MonoBehaviour
     public void GameStar()
     {
         Debug.Log("游戏开始");
-        //实例化签到面板
-        //siginPanel = new SiginPanel();
+      
         siginPanel = ResMgr.Getinstate().Load<SiginPanel>("UI/Signin");
         if (UIManager.Getinstate().panelDic.ContainsKey("Signin"))
         {
@@ -57,24 +56,32 @@ public class GameMain : MonoBehaviour
                 var item = ResMgr.Getinstate().Load<GameObject>("UI/Item");//通过资源管理类，根据路径加载 item prefab
                 item.transform.SetParent(grid, false);
                 item.transform.localPosition = Vector3.zero;//设置item所在位置
+                //tudo 
+                
             }
             var items = grid.GetComponentsInChildren<item>();//拿到所有item的脚本，从Json赋值
             for (int i = 0; i < items.Length; i++)
             {
+                items[i].init();
                 items[i].itemName = jitems.m_Jsonitems[i].name;//设置物体
                 items[i].itemInfo = jitems.m_Jsonitems[i].Info;//设置物体信息
                 items[i].daynumber = jitems.m_Jsonitems[i].dayNumber;//设置天数
-                //items[i].AddTrigger(() =>
-                //{
-                //    Debug.Log("我是签到功能");
-                //    SaveAndClose();
-                //    UIManager.Getinstate().HidePanel("Signin");//生命周期结束，关闭面板
-                //});
-            }
+                items[i].isAlready = jitems.m_Jsonitems[i].isAlready;//设置是否已签到
 
+                items[i].AddTrigger(() =>
+                {
+                    Debug.Log("我是签到功能");
+                    SaveAndClose();//保存所有状态到Json
+                  
+                });
+                items[i].initLate();
+            }
+            
             siginPanel = obj;
         });
     }
+
+
 
     public void SaveAndClose()
     {
@@ -88,6 +95,7 @@ public class GameMain : MonoBehaviour
             signinJson.dayNumber = item.daynumber;
             signinJson.Info = item.itemInfo;
             signinJson.name = item.itemName;
+            signinJson.isAlready = item.isAlready;
             jsonItems.m_Jsonitems.Add(signinJson);//添加到Json列表
         }
 
@@ -109,4 +117,5 @@ public class SigninJson
     public string dayNumber;
     public string name;
     public string Info;
+    public bool isAlready;
 }
