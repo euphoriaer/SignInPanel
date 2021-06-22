@@ -1,30 +1,43 @@
 using LitJson;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameMain : SingletnoAutoMono<GameMain>
 {
-    public static string jsonPath = @"C:\Users\panbin\Desktop\signin2.txt";
+    public static string jsonPath = "";
     public static string jsonCon = "";
 
     public SiginPanel siginPanel;
     public GameObject father;
 
+    private void Awake()
+    {
+        FileInfo txtPath = new FileInfo("Assets/Resources/signin2.txt");
+        jsonPath = txtPath.FullName;
+    }
+
     // Start is called before the first frame update
     private void Start()
     {
-      
-        //siginPanel = ResMgr.Getinstate().Load<SiginPanel>("UI/Signin");
-        //siginPanel.transform.SetParent(father.transform);
+     
         GameStar();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            Debug.Log("打开签到面板");
+            siginPanel.gameObject.SetActive(true);
+        }
     }
 
     public void GameStar()
     {
         Debug.Log("游戏开始");
-      
+
         siginPanel = ResMgr.Getinstate().Load<SiginPanel>("UI/Signin");
         if (UIManager.Getinstate().panelDic.ContainsKey("Signin"))
         {
@@ -41,23 +54,14 @@ public class GameMain : SingletnoAutoMono<GameMain>
             string jsonCon = File.ReadAllText(GameMain.jsonPath);
             JsonReader json = new JsonReader(jsonCon);
             var jitems = JsonMapper.ToObject<JsonItems>(json);
-            //数据读取完毕，打印一下，然后加载到面板上
-            //foreach (var jitem in jitems.m_Jsonitems)
-            //{
-            //    Debug.Log("物品名：" + jitem.name + "\n" +
-            //        "描述名" + jitem.Info + "\n" +
-            //        "天数：" + jitem.dayNumber);
-            //}
-            //根据数据加载天数
-
+         
             Transform grid = obj.transform.Find("Grid").gameObject.transform;
             foreach (var jitem in jitems.m_Jsonitems)
             {
                 var item = ResMgr.Getinstate().Load<GameObject>("UI/Item");//通过资源管理类，根据路径加载 item prefab
                 item.transform.SetParent(grid, false);
                 item.transform.localPosition = Vector3.zero;//设置item所在位置
-                //tudo 
-                
+                                                            //tudo
             }
             var items = grid.GetComponentsInChildren<item>();//拿到所有item的脚本，从Json赋值
             for (int i = 0; i < items.Length; i++)
@@ -72,16 +76,19 @@ public class GameMain : SingletnoAutoMono<GameMain>
                 {
                     Debug.Log("我是签到功能");
                     SaveAndClose();//保存所有状态到Json
-                  
                 });
                 items[i].initLate();
             }
-            
+
             siginPanel = obj;
+            obj.transform.localScale = new Vector3(2, 2, 2);
+            Button close = obj.closeButton.GetComponent<Button>();
+            close.onClick.AddListener(() =>
+            {
+                obj.gameObject.SetActive(false);
+            });
         });
     }
-
-
 
     public void SaveAndClose()
     {
@@ -101,9 +108,20 @@ public class GameMain : SingletnoAutoMono<GameMain>
 
         //序列化对象 写入文件
         string jsonCon = JsonMapper.ToJson(jsonItems);
-        jsonCon = Regex.Unescape(jsonCon);
+        Write(jsonPath, jsonCon);
         Debug.Log("Json保存的数据为" + jsonCon);
-        File.WriteAllText(jsonPath, jsonCon);//UTF8编码保存
+    }
+
+    public void Write(string path, string con)
+    {
+        FileStream fs = new FileStream(path, FileMode.Create);
+        //获得字节数组
+        byte[] data = System.Text.Encoding.Default.GetBytes(con);
+        //开始写入
+        fs.Write(data, 0, data.Length);
+        //清空缓冲区、关闭流
+        fs.Flush();
+        fs.Close();
     }
 }
 

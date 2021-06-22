@@ -13,7 +13,7 @@ public class item : MonoBehaviour
     public Image t_image;
     private Button btn_close;
     public Transform isAlreadyimg;
-    public bool isAlready=false;
+    public bool isAlready = false;
 
     // Start is called before the first frame update
     private void Start()
@@ -30,19 +30,18 @@ public class item : MonoBehaviour
         t_dayint = this.gameObject.transform.Find("day").GetComponent<Text>();
         btn_close = this.GetComponent<Button>();
         t_image = this.GetComponent<Image>();
-       
+
         isAlreadyimg = this.gameObject.transform.Find("isAlready").transform;
     }
 
     public void AddTrigger(UnityAction action)//传递一个委托交给button绑定
     {
-        btn_close.onClick.AddListener(action);
         btn_close.onClick.AddListener(() =>
         {
-           
             isAlready = true;
             isAlreadyimg.gameObject.SetActive(isAlready);
         });
+        btn_close.onClick.AddListener(action);
     }
 
     public void initLate()
@@ -51,7 +50,7 @@ public class item : MonoBehaviour
         t_dayint.text = daynumber;
         t_image.sprite = ResMgr.Getinstate().Load<Sprite>("RPGicons/" + itemName);
         isAlreadyimg = this.gameObject.transform.Find("isAlready").transform;
-        if (isAlreadyimg!=null)
+        if (isAlreadyimg != null)
         {
             isAlreadyimg.gameObject.SetActive(isAlready);
         }
@@ -64,11 +63,9 @@ public class item : MonoBehaviour
             Debug.Log("已签到" + t_dayint.text);
         }
     }
+
     // Update is called once per frame
     private void Update()
     {
-        
     }
-
-    
 }

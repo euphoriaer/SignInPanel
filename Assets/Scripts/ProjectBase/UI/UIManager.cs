@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -13,7 +12,6 @@ public enum E_UI_Layer
     Top,
     System,
 }
-
 
 /// <summary>
 /// UI管理器
@@ -35,9 +33,9 @@ public class UIManager : BaseManager<UIManager>
     public UIManager()
     {
         //创建 Canvas 让其过场景不被移除
-       GameObject obj= ResMgr.Getinstate().Load<GameObject>("UI/Canvas");
+        GameObject obj = ResMgr.Getinstate().Load<GameObject>("UI/Canvas");
         canvas = obj.transform;
-        
+
         GameObject.DontDestroyOnLoad(obj);
         //找到各层
         bot = canvas.Find("Bot");
@@ -45,13 +43,11 @@ public class UIManager : BaseManager<UIManager>
         top = canvas.Find("Top");
         system = canvas.Find("System");
 
-
         //创建EventSystem 让过场景不溢出
         obj = ResMgr.Getinstate().Load<GameObject>("UI/EventSystem");
         GameObject.DontDestroyOnLoad(obj);
-
-
     }
+
     /// <summary>
     /// 显示面板
     /// </summary>
@@ -59,7 +55,7 @@ public class UIManager : BaseManager<UIManager>
     /// <param name="panelName">面板名</param>
     /// <param name="layer">显示在哪一层</param>
     /// <param name="callback">当面板预设体创建成功后，你想做的事</param>
-    public void ShowPanel<T>(string panelName,E_UI_Layer layer,UnityAction<T>callback) where T:BasePanel
+    public void ShowPanel<T>(string panelName, E_UI_Layer layer, UnityAction<T> callback) where T : BasePanel
     {
         ResMgr.Getinstate().LoadAsync<GameObject>("UI/" + panelName, (obj) =>
            {
@@ -70,22 +66,24 @@ public class UIManager : BaseManager<UIManager>
                Transform father = bot;
                switch (layer)
                {
-               
                    case E_UI_Layer.Mid:
                        father = Mid;
                        break;
+
                    case E_UI_Layer.Top:
                        father = top;
                        break;
+
                    case E_UI_Layer.System:
                        father = system;
                        break;
+
                    default:
                        break;
                }
                //设置父对象 设置相对位置和大小
-               Debug.Log("设置面板位置" + obj.name+ father.name);
-               obj.transform.SetParent(father,true);
+               Debug.Log("设置面板位置" + obj.name + father.name);
+               obj.transform.SetParent(father, true);
                obj.transform.localPosition = Vector3.zero;
 
                //(obj.transform as RectTransform).offsetMax = Vector2.zero;
@@ -93,25 +91,22 @@ public class UIManager : BaseManager<UIManager>
                //得到预设体身上的面板脚本
                T panel = obj.GetComponent<T>();
                //处理面板完成后的逻辑
-               if (callback!=null)
+               if (callback != null)
                {
                    callback(panel);
                }
-              
+
                if (panelDic.ContainsKey(panelName))
                {
-
                }
                else
                {
                    //把面板存起来
                    panelDic.Add(panelName, panel);
                }
-           
-
            });
-      
     }
+
     /// <summary>
     /// 隐藏面板
     /// </summary>
@@ -125,5 +120,4 @@ public class UIManager : BaseManager<UIManager>
             //panelDic.Remove(panelName);
         }
     }
-
 }
